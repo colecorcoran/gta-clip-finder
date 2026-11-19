@@ -1,0 +1,12 @@
+# Results from your own VODs (chat, transcripts, picks)
+runs/
+
+# Downloaded helper programs and the speech model (re-downloaded automatically)
+tools/
+
+# Leftovers
+__pycache__/
+*.pyc
+*.part
+.DS_Store
+.claude/settings.local.json

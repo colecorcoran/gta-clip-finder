@@ -2,6 +2,7 @@
 """Clip Finder: finds the best clip moments in a Twitch VOD.
 
 Usage (use "python" instead of "python3" on Windows):
+  python3 find_clips.py setup                             # check/install helpers + speech model (first time)
   python3 find_clips.py analyze <twitch VOD link or ID>   # steps 1-5: chat, spikes, audio around spikes, transcribe
   python3 find_clips.py render <VOD ID>                   # step 7: turn picks.json into moments.md
 
@@ -361,8 +362,61 @@ def render(arg):
     print(f"✅ Wrote {run_dir / 'moments.md'} ({len(picks)} moments)")
 
 
+# ---- Setup check ------------------------------------------------------------
+INSTALL = {  # program -> (Mac install command, Windows install command)
+    "yt-dlp": ("brew install yt-dlp", "winget install -e --id yt-dlp.yt-dlp"),
+    "ffmpeg": ("brew install ffmpeg", "winget install -e --id Gyan.FFmpeg"),
+    "whisper-cli": ("brew install whisper-cpp", None),  # Windows: downloaded automatically
+}
+
+
+def missing_programs():
+    missing = []
+    for prog, (mac, win) in INSTALL.items():
+        if prog == "whisper-cli" and IS_WINDOWS:
+            continue
+        if not shutil.which(prog) and not (prog == "whisper-cli" and (TOOLS / "whisper").exists()):
+            missing.append((prog, win if IS_WINDOWS else mac))
+    return missing
+
+
+def check_programs():
+    missing = missing_programs()
+    if missing:
+        print("❌ Missing programs:")
+        for prog, cmd in missing:
+            print(f"   {prog:12} install with:  {cmd}")
+        if not IS_WINDOWS and not shutil.which("brew"):
+            print("   Homebrew isn't installed either. Install it first (see README.md, Mac setup step 1).")
+        if IS_WINDOWS:
+            print("   After installing, close and reopen the terminal/Claude Code so Windows can find them.")
+        sys.exit(2)
+
+
+def setup(_=None):
+    """Check everything is installed and download the helper programs + speech model."""
+    print(f"Python {platform.python_version()} on {platform.system()} ({platform.machine()})")
+    check_programs()
+    print("✓ yt-dlp, ffmpeg" + ("" if IS_WINDOWS else ", whisper-cli") + " found")
+    ensure_tdl()
+    print("✓ TwitchDownloaderCLI ready")
+    find_whisper()
+    print("✓ Whisper ready")
+    ensure_model()
+    print(f"✓ Speech model '{WHISPER_MODEL}' ready")
+    print("\n✅ All set up. Paste a Twitch VOD link and say \"find clips\".")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3 or sys.argv[1] not in ("analyze", "render"):
+    if sys.version_info < (3, 8):
+        die("Python 3.8 or newer is needed.")
+    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
+    if cmd == "setup" and len(sys.argv) == 2:
+        setup()
+    elif cmd in ("analyze", "render") and len(sys.argv) == 3:
+        if cmd == "analyze":
+            check_programs()
+        {"analyze": analyze, "render": render}[cmd](sys.argv[2])
+    else:
         print(__doc__)
         sys.exit(1)
-    {"analyze": analyze, "render": render}[sys.argv[1]](sys.argv[2])

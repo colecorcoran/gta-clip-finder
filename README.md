@@ -20,71 +20,63 @@ A typical run takes about 3-6 minutes on a Mac, whatever the stream length.
 
 ---
 
-## Setup on Mac
+## Quick setup (Claude Code does the rest)
 
-**1. Install Homebrew** (a free tool that installs other programs).
-Open the **Terminal** app, paste this, press Enter, and follow what it says:
+You only do three things yourself. The first time you say "find clips", Claude Code checks your computer and
+installs anything missing (yt-dlp, ffmpeg, Whisper, the speech model) for you, explaining each step.
 
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+**1. Install Claude Code** (needs a Claude account).
 
-**2. Install the programs this needs** (Python, yt-dlp for downloading, ffmpeg for audio, Whisper for speech-to-text):
+- **Mac:** open the **Terminal** app, paste this and press Enter:
+  ```
+  curl -fsSL https://claude.ai/install.sh | bash
+  ```
+- **Windows:** open **PowerShell** (Start menu → type "PowerShell"), paste this and press Enter:
+  ```
+  irm https://claude.ai/install.ps1 | iex
+  ```
 
-```
-brew install python yt-dlp ffmpeg whisper-cpp
-```
+**2. Download this project.** At the top of this GitHub page click the green **Code** button, then **Download ZIP**.
+Unzip it (Mac: double-click it. Windows: right-click → **Extract All**).
 
-**3. Download this project.** At the top of this GitHub page click the green **Code** button, then **Download ZIP**.
-Double-click the ZIP in your Downloads folder to unzip it.
+**3. Open the project in Claude Code.**
 
-**4. Install Claude Code** (needs a Claude account):
+- **Mac** (in Terminal):
+  ```
+  cd ~/Downloads/gta-clip-finder-main
+  claude
+  ```
+- **Windows** (in PowerShell):
+  ```
+  cd $HOME\Downloads\gta-clip-finder-main\gta-clip-finder-main
+  claude
+  ```
+  (If that folder doesn't exist, look in Downloads for where the ZIP was extracted.)
 
-```
-curl -fsSL https://claude.ai/install.sh | bash
-```
+That's it. Go to [Using it](#using-it). Claude Code will ask your permission before installing anything.
 
-**5. Open the project in Claude Code.** In Terminal:
+**Good to know about the first run:**
+- **Mac:** if you don't have [Homebrew](https://brew.sh) (a free tool that installs programs), Claude will give you
+  one command to paste, because Homebrew's installer asks for your Mac password.
+- **Windows:** after Claude installs programs, it may ask you to close and reopen Claude Code once so Windows can
+  find them.
+- The speech model is about 1.6 GB, so the very first run takes a few extra minutes.
 
-```
-cd ~/Downloads/gta-clip-finder-main
-claude
-```
+<details>
+<summary><b>Manual setup (if you'd rather install everything yourself)</b></summary>
 
-Then go to [Using it](#using-it).
+**Mac:**
+1. Install Homebrew: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+2. `brew install python yt-dlp ffmpeg whisper-cpp`
+3. In the project folder: `python3 find_clips.py setup`
 
-## Setup on Windows
+**Windows:**
+1. Install Python from [python.org/downloads](https://www.python.org/downloads/) and **tick "Add python.exe to PATH"**.
+2. In PowerShell: `winget install -e --id yt-dlp.yt-dlp` and `winget install -e --id Gyan.FFmpeg`, then close and
+   reopen PowerShell.
+3. In the project folder: `python find_clips.py setup` (this also downloads Whisper).
 
-**1. Install Python.** Go to [python.org/downloads](https://www.python.org/downloads/), download it, and run the
-installer. **Tick the box "Add python.exe to PATH"** on the first screen.
-
-**2. Install yt-dlp and ffmpeg.** Open **PowerShell** (Start menu → type "PowerShell") and paste:
-
-```
-winget install yt-dlp.yt-dlp Gyan.FFmpeg
-```
-
-Then **close PowerShell and open it again** so it can find the new programs.
-
-**3. Download this project.** At the top of this GitHub page click the green **Code** button, then **Download ZIP**.
-Right-click the ZIP in your Downloads folder → **Extract All**.
-
-**4. Install Claude Code** (needs a Claude account). In PowerShell:
-
-```
-irm https://claude.ai/install.ps1 | iex
-```
-
-**5. Open the project in Claude Code.** In PowerShell:
-
-```
-cd $HOME\Downloads\gta-clip-finder-main\gta-clip-finder-main
-claude
-```
-
-(If that folder doesn't exist, look in Downloads for where the ZIP was extracted.)
-
-Whisper itself downloads automatically the first time you run it on Windows.
+</details>
 
 ---
 
@@ -96,7 +88,7 @@ In Claude Code, paste a VOD link and say **find clips**, like this:
 https://www.twitch.tv/videos/1234567890 find clips
 ```
 
-The first run downloads a couple of helper programs and the speech model (about 1.7 GB, one time only).
+The first time, Claude sets everything up before it starts (see above).
 Your results are saved in `runs/<VOD number>/moments.md`.
 
 ## Tips
